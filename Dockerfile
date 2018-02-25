@@ -1,26 +1,5 @@
-## Container containing a Torque scheduling server inside ubuntu
-### and access via ssh to a 'testuser' user.
-### To use as a service, SSH to this container as user testuser.
-### It is suggested to put job scripts in /scratch (that you might
-### want to create as a data volume for efficiency
-###
-### Note! Torque-mom requires that 'ulimit -l unlimited' is set. To achieve
-### This, you need to run this container with the '--privileged' option
-
-# Use phusion/baseimage as base image. To make your builds
-# reproducible, make sure you lock down to a specific version, not
-# to `latest`! See
-# https://github.com/phusion/baseimage-docker/blob/master/Changelog.md
-# for a list of version numbers.
-# Note also that we use phusion because, as explained on the
-# http://phusion.github.io/baseimage-docker/ page, it automatically
-# contains and starts all needed services (like logging), it
-# takes care of sending around signals when stopped, etc.
 FROM phusion/baseimage:0.9.19
-MAINTAINER AiiDA Team <info@aiida.net>
-
-# Use baseimage-docker's init system.
-CMD ["/sbin/my_init"]
+MAINTAINER Lachlan Mason <l.mason@imperial.ac.uk>
 
 # Install required packages
 RUN apt-get update \
@@ -32,24 +11,15 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean all
 
-# Enable SSH
+# Enable ssh, see following link for ssh documentation
+# https://github.com/phusion/baseimage-docker#login-to-the-container-or-running-a-command-inside-it-via-ssh
 RUN rm -f /etc/service/sshd/down && \
     echo "UsePAM yes" >> /etc/ssh/sshd_config
 
-## Note: I don't do this in ann image. Rather,
-## I let it do it at runtime for security.
-##
-## Regenerate SSH host keys. baseimage-docker does not contain any, so you
-## have to do that yourself. You may also comment out this instruction; the
-## init system will auto-generate one during boot.
-#RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
-
-
-# Put needed scripts (these will be run before the services)
 RUN mkdir -p /etc/my_init.d
 COPY ./scripts/setup-hostnames.sh /etc/my_init.d/01_setup-hostnames.sh
 
-# This must coincide with the value set in setup-hostnames.sh
+# This must coincide with the value set in scripts/setup-hostnames.sh
 ENV HOSTNAME simulator
 
 # Set the hostname by hand in the various configuration files
@@ -95,8 +65,6 @@ RUN mkdir /scratch
 
 # Expose SSH port
 EXPOSE 22
-
-### User to run job with the scheduler (root not allowed) ###
 
 # create an empty authorized_keys for user 'testuser', give right permissions
 RUN useradd --create-home --home /home/testuser \
