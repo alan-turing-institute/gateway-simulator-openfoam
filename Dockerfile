@@ -1,6 +1,6 @@
 ## Container containing a Torque scheduling server inside ubuntu
-### and access via ssh to a 'app' user.
-### To use as a service, SSH to this container as user app.
+### and access via ssh to a 'testuser' user.
+### To use as a service, SSH to this container as user testuser.
 ### It is suggested to put job scripts in /scratch (that you might
 ### want to create as a data volume for efficiency
 ###
@@ -98,18 +98,18 @@ EXPOSE 22
 
 ### User to run job with the scheduler (root not allowed) ###
 
-# create an empty authorized_keys for user 'app', give right permissions
-RUN useradd --create-home --home /home/app \
-      --shell /bin/bash app && \
-    usermod -L app && \
-    chown app:app /scratch && \
-    mkdir /home/app/.ssh && \
-    touch /home/app/.ssh/authorized_keys && \
-    chown -R app:app /home/app/.ssh && \
-    chmod -R go= /home/app/.ssh
+# create an empty authorized_keys for user 'testuser', give right permissions
+RUN useradd --create-home --home /home/testuser \
+      --shell /bin/bash testuser && \
+    usermod -L testuser && \
+    chown testuser:testuser /scratch && \
+    mkdir /home/testuser/.ssh && \
+    touch /home/testuser/.ssh/authorized_keys && \
+    chown -R testuser:testuser /home/testuser/.ssh && \
+    chmod -R go= /home/testuser/.ssh
 
 ## Put the script for the initial setup of the authorized_keys of the
-## app user
+## testuser user
 COPY ./scripts/init_authorized_keys.sh /etc/my_init.d/init_authorized_keys.sh
 
 # So that supervisord log files go in /root and are not visible

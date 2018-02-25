@@ -19,6 +19,5 @@ docker run -d --privileged -e AUTHORIZED_KEY="$SIMULATOR_KEY_PUBLIC" -p 10022:22
 Connect via ssh:
 
 ```bash
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i simulator_key -p 10022 app@localhost
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i simulator_key -p 10022 testuser@localhost
 ```
-
