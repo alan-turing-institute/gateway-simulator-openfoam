@@ -8,6 +8,7 @@ RUN apt-get update \
     torque-server \
     torque-mom \
     torque-client \
+    wget \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean all
 
@@ -89,3 +90,9 @@ RUN mkdir -p /etc/service/torque_server && \
 
 COPY ./scripts/torque_server_run.sh /etc/service/torque_server/run
 COPY ./scripts/torque_mom_scheduler_run.sh /etc/service/torque_mom_scheduler/run
+
+# openfoam dependencies
+RUN wget -O - http://dl.openfoam.org/gpg.key | apt-key add - \
+    && add-apt-repository http://dl.openfoam.org/ubuntu \
+    && apt-get update \
+    && apt-get -y install openfoam4
