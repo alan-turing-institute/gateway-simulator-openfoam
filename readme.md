@@ -2,22 +2,20 @@
 
 ### Installation
 
-Create an ssh key pair for connecting to the container:
-
-```bash
-ssh-keygen -t rsa -f simulator_key -C "Key for simulator Docker container" -N ''
-export SIMULATOR_KEY_PUBLIC=$(cat simulator_key.pub)
-```
-
 Build and run the container:
 
 ```bash
-docker build -t simulator_base .
-docker run -d --privileged -e AUTHORIZED_KEY="$SIMULATOR_KEY_PUBLIC" -p 10022:22 simulator_base
+(cd keys && ./create_keys.sh)
+docker-compose up
 ```
 
-Connect via ssh:
+Connect via ssh (with various workarounds for possible authentication errors):
 
 ```bash
-ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i simulator_key -p 10022 testuser@localhost
+ssh -o IdentitiesOnly=yes \
+    -o UserKnownHostsFile=/dev/null \
+    -o StrictHostKeyChecking=no \
+    -i keys/simulator_key \
+    -p 10022 \
+    testuser@localhost
 ```

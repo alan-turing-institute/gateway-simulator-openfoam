@@ -92,7 +92,7 @@ COPY ./scripts/torque_server_run.sh /etc/service/torque_server/run
 COPY ./scripts/torque_mom_scheduler_run.sh /etc/service/torque_mom_scheduler/run
 
 # openfoam dependencies
-RUN wget -O - http://dl.openfoam.org/gpg.key | apt-key add - \
-    && add-apt-repository http://dl.openfoam.org/ubuntu \
-    && apt-get update \
-    && apt-get -y install openfoam4
+# RUN wget -O - http://dl.openfoam.org/gpg.key | apt-key add - \
+#     && add-apt-repository http://dl.openfoam.org/ubuntu \
+#     && apt-get update \
+#     && apt-get -y install openfoam4
