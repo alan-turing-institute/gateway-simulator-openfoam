@@ -1,0 +1,9 @@
+version: '3'
+services:
+  simulator:
+    build: .
+    env_file:
+     - keys/simulator.env
+    ports:
+    - "10022:22"
+    privileged: true
