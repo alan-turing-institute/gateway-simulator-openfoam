@@ -5,5 +5,5 @@ services:
     env_file:
      - ./keys/simulator.env
     ports:
-    - "10023:22"
+    - "10022:22"
     privileged: true
