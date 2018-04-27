@@ -4,6 +4,7 @@ MAINTAINER Lachlan Mason <l.mason@imperial.ac.uk>
 # Install required packages
 RUN apt-get update \
     && apt-get install -y \
+    python-setuptools \
     torque-scheduler \
     torque-server \
     torque-mom \
@@ -11,6 +12,9 @@ RUN apt-get update \
     wget \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean all
+
+# install pip (necessary to install PyFoam)
+RUN easy_install pip
 
 # Enable ssh, see following link for ssh documentation
 # https://github.com/phusion/baseimage-docker#login-to-the-container-or-running-a-command-inside-it-via-ssh
@@ -96,3 +100,8 @@ RUN wget -O - http://dl.openfoam.org/gpg.key | apt-key add - \
     && add-apt-repository http://dl.openfoam.org/ubuntu \
     && apt-get update \
     && apt-get -y install openfoam5
+
+# set env vars to run OpenFOAM
+RUN echo 'source /opt/openfoam5/etc/bashrc' >> /home/testuser/.bashrc
+# install PyFoam package to patch parameters
+RUN pip install PyFoam
