@@ -101,10 +101,14 @@ RUN wget -O - http://dl.openfoam.org/gpg.key | apt-key add - \
     && apt-get update \
     && apt-get -y install openfoam5
 
-# set env vars to run OpenFOAM
-RUN echo 'source /opt/openfoam5/etc/bashrc' >> /home/testuser/.bashrc
 # install PyFoam package to patch parameters
 RUN pip install PyFoam
+
+# install zip, to zip up the output
+RUN apt-get -y install zip
+
+# install jq, to parse the json containing azure token etc.
+RUN apt-get -y install jq
 
 # install Azure CLI - instructions from https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest
 RUN AZ_REPO=$(lsb_release -cs) \
@@ -114,3 +118,5 @@ RUN AZ_REPO=$(lsb_release -cs) \
 RUN curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN apt-get install -y apt-transport-https
 RUN apt-get update && apt-get install -y --allow-unauthenticated azure-cli
+
+
