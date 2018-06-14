@@ -4,6 +4,7 @@ MAINTAINER Lachlan Mason <l.mason@imperial.ac.uk>
 # Install required packages
 RUN apt-get update \
     && apt-get install -y \
+    python-setuptools \
     torque-scheduler \
     torque-server \
     torque-mom \
@@ -11,6 +12,9 @@ RUN apt-get update \
     wget \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean all
+
+# install pip (necessary to install PyFoam)
+RUN easy_install pip
 
 # Enable ssh, see following link for ssh documentation
 # https://github.com/phusion/baseimage-docker#login-to-the-container-or-running-a-command-inside-it-via-ssh
@@ -96,3 +100,23 @@ RUN wget -O - http://dl.openfoam.org/gpg.key | apt-key add - \
     && add-apt-repository http://dl.openfoam.org/ubuntu \
     && apt-get update \
     && apt-get -y install openfoam5
+
+# install PyFoam package to patch parameters
+RUN pip install PyFoam
+
+# install zip, to zip up the output
+RUN apt-get -y install zip
+
+# install jq, to parse the json containing azure token etc.
+RUN apt-get -y install jq
+
+# install Azure CLI - instructions from https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest
+RUN AZ_REPO=$(lsb_release -cs) \
+    &&  echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
+    tee /etc/apt/sources.list.d/azure-cli.list
+#RUN apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
+RUN curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN apt-get install -y apt-transport-https
+RUN apt-get update && apt-get install -y --allow-unauthenticated azure-cli
+
+
