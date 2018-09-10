@@ -10,11 +10,12 @@ RUN apt-get update \
     torque-mom \
     torque-client \
     wget \
+    bzip2 \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean all
 
-# install pip (necessary to install PyFoam)
-RUN easy_install pip
+# install pip
+# RUN easy_install pip
 
 # Enable ssh, see following link for ssh documentation
 # https://github.com/phusion/baseimage-docker#login-to-the-container-or-running-a-command-inside-it-via-ssh
@@ -100,9 +101,23 @@ RUN wget -O - http://dl.openfoam.org/gpg.key | apt-key add - \
     && add-apt-repository http://dl.openfoam.org/ubuntu \
     && apt-get update \
     && apt-get -y install openfoam5
+RUN echo ". /opt/openfoam5/etc/bashrc" >> /home/testuser/.bashrc
 
-# install PyFoam package to patch parameters
-RUN pip install PyFoam
+RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+
+USER testuser
+ADD requirements.txt /home/testuser/
+RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
+
+USER root
+# install python packages from requirements file
+RUN . /opt/conda/etc/profile.d/conda.sh && \
+    conda activate base && \
+    /opt/conda/bin/pip install -r /home/testuser/requirements.txt
 
 # install zip, to zip up the output
 RUN apt-get -y install zip
@@ -119,4 +134,4 @@ RUN curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN apt-get install -y apt-transport-https
 RUN apt-get update && apt-get install -y --allow-unauthenticated azure-cli
 
-
+WORKDIR /tmp
