@@ -108,10 +108,11 @@ RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86
     rm ~/miniconda.sh && \
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
 
-USER testuser
+# setting `USER testuser` for the following lines breaks docker build on Azure VM
 ADD requirements.txt /home/testuser/
-RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate base" >> ~/.bashrc
+RUN chown -R testuser:testuser /home/testuser/requirements.txt
+RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/testuser/.bashrc && \
+    echo "conda activate base" >> /home/testuser/.bashrc
 
 USER root
 # install python packages from requirements file
