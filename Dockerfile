@@ -135,4 +135,6 @@ RUN curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 RUN apt-get install -y apt-transport-https
 RUN apt-get update && apt-get install -y --allow-unauthenticated azure-cli
 
+RUN apt-get install -y git
+
 WORKDIR /tmp
