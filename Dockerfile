@@ -115,26 +115,24 @@ RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> /home/testuser/.bashrc && \
     echo "conda activate base" >> /home/testuser/.bashrc
 
 USER root
-# install python packages from requirements file
+
+# install python 3 environment as "base"
 RUN . /opt/conda/etc/profile.d/conda.sh && \
     conda activate base && \
     /opt/conda/bin/pip install -r /home/testuser/requirements.txt
 
-# install zip, to zip up the output
-RUN apt-get -y install zip
+# install python 2.7 environment as "ml"
+RUN . /opt/conda/etc/profile.d/conda.sh && \
+    conda create --name ml python=2.7 && \
+    conda activate ml && \
+    /opt/conda/envs/ml/bin/pip install -r /home/testuser/requirements.txt
 
-# install jq, to parse the json containing azure token etc.
-RUN apt-get -y install jq
+RUN apt-get install -y git libxcursor-dev libxft-dev libxinerama-dev
 
-# install Azure CLI - instructions from https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest
-RUN AZ_REPO=$(lsb_release -cs) \
-    &&  echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
-    tee /etc/apt/sources.list.d/azure-cli.list
-#RUN apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
-RUN curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN apt-get install -y apt-transport-https
-RUN apt-get update && apt-get install -y --allow-unauthenticated azure-cli
-
-RUN apt-get install -y git
-
+# install gmsh from web
 WORKDIR /tmp
+RUN mkdir /opt/gmsh && \
+    cd /opt/gmsh && \
+    wget http://gmsh.info/bin/Linux/gmsh-3.0.6-Linux64.tgz && \
+    tar -xvzf gmsh-3.0.6-Linux64.tgz && \
+    ln -s /opt/gmsh/gmsh-3.0.6-Linux64/bin/gmsh /usr/bin/gmsh 
